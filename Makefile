@@ -56,9 +56,10 @@ library:
 
 clean:
 	$(MAKE) -f Makefile.library clean
-	-rm -rf bin
 	-rm -rf lib
 
+superclean: clean
+	-rm -rf bin
 
 bin:      programs
 examples: programs
