@@ -1,3 +1,16 @@
 bin
 lib
 obj
+*.o
+*.wav
+*.m4a
+*.aac
+*.mp4
+*.mp3
+*.bak
+*.tif
+*.tiff
+*.png
+*.gif
+*.jpg
+*.jpeg
