@@ -1,8 +1,7 @@
-Midi Piano Rolls
-==================
+# Midi Piano Rolls
 
 
-== Downloading ==
+## Downloading
 
 To download using git in a terminal:
 
@@ -10,7 +9,7 @@ To download using git in a terminal:
 git clone https://github.com/craigsapp/midiroll
 ```
 
-== Compiling ==
+## Compiling
 
 To compile, type:
 
