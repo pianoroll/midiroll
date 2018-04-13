@@ -56,14 +56,16 @@ endif
 
 OBJDIR    = obj
 SRCDIR    = external/midifile/src
+SRCDIR2   = src
 INCDIR    = external/midifile/include
+INCDIR2   = include
 LIBDIR    = lib
 LIBFILE   = libmidiroll.a
 COMPILER  = LANG=C $(ENV) g++ $(ARCH)
 AR        = ar
 RANLIB    = ranlib
 DEFINES   =
-PREFLAGS  = -c -g -Wall -O3 $(DEFINES) -I$(INCDIR)
+PREFLAGS  = -c -g -Wall -O3 $(DEFINES) -I$(INCDIR) -I$(INCDIR2)
 
 # Using C++ 2011 standard:
 PREFLAGS += -std=c++11
@@ -84,12 +86,12 @@ PREFLAGS += -std=c++11
 
 
 # setting up the directory paths to search for dependency files
-vpath %.h   $(INCDIR):$(SRCDIR)
-vpath %.cpp $(SRCDIR):$(INCDIR)
+vpath %.h   $(INCDIR):$(SRCDIR):$(INCDIR2):$(SRCDIR2)
+vpath %.cpp $(SRCDIR):$(INCDIR):$(SRCDIR2):$(INCDIR2)
 vpath %.o   $(OBJDIR)
 
 # generating a list of the object files
-OBJS = $(notdir $(patsubst %.cpp,%.o,$(wildcard $(SRCDIR)/*.cpp)))
+OBJS = $(notdir $(patsubst %.cpp,%.o,$(wildcard $(SRCDIR)/*.cpp $(SRCDIR2)/*.cpp)))
 
 
 

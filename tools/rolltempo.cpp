@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Wed Apr 11 16:24:24 PDT 2018
-// Last Modified: Wed Apr 11 16:41:57 PDT 2018
+// Last Modified: Fri Apr 13 08:13:45 PDT 2018
 // Filename:      midiroll/tools/rolltempo.cpp
 // Syntax:        C++11
 // vim:           ts=3
@@ -18,7 +18,7 @@
 //
 
 #include "Options.h"
-#include "MidiFile.h"
+#include "MidiRoll.h"
 #include <iostream>
 
 using namespace std;
@@ -27,15 +27,6 @@ using namespace std;
 void    displayTempo     (Options& options);
 void    setTempo         (Options& options);
 
-// The mutliplier to convert from tempo to ticks:
-// The ticks-per-quarter note are 6 times the tempo.
-// One tick represents one image pixel row.  The image is
-// scanned at 300 dpi (measured actually to be about 300.25 dpi).
-// A tempo of 100 means the roll moves (at its start) by
-// 10.0 feet per minute.  This is 10.0 * 300 * 12 = 36000 rows/minute.
-// A reference tempo of 60 bpm is used, so each "quarter note" is
-// 36000 / 60 = 600 rows.
-const double factor = 6.0;
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -70,24 +61,20 @@ int main(int argc, char** argv) {
 //
 
 void setTempo(Options& options) {
-	int tpq = int(factor * options.getDouble("tempo") + 0.5);
-	if (tpq < 1)      { tpq = 1; }
-	if (tpq > 0x7fff) { tpq = 0x7fff; }
-
-	MidiFile midifile;
+	MidiRoll midiroll;
 	if (options.getArgCount() == 0) {
 		// Read from standard input and write to standard output:
-		midifile.read(cin);
-		midifile.setTicksPerQuarterNote(tpq);
-		cout << midifile;
+		midiroll.read(cin);
+		midiroll.setRollTempo(options.getDouble("tempo"));
+		cout << midiroll;
 	} else {
 		for (int i=0; i < options.getArgCount(); i++) {
 			if (i > 1) {
 				cerr << "Processing file " << options.getArgCount() << endl;
 			}
-			midifile.read(options.getArg(i+1));
-			midifile.setTicksPerQuarterNote(tpq);
-			midifile.write(options.getArg(i+1));
+			midiroll.read(options.getArg(i+1));
+			midiroll.setRollTempo(options.getDouble("tempo"));
+			midiroll.write(options.getArg(i+1));
 		}
 	}
 }
@@ -101,19 +88,19 @@ void setTempo(Options& options) {
 //
 
 void displayTempo(Options& options) {
-	MidiFile midifile;
+	MidiRoll midiroll;
 
 	// display the tempos of each MIDI file
 	if (options.getArgCount() == 0) {
-		midifile.read(cin);
-		cout << midifile.getTicksPerQuarterNote() / factor << endl;
+		midiroll.read(cin);
+		cout << midiroll.getRollTempo() << endl;
 	} else {
 		for (int i=0; i<options.getArgCount(); i++) {
-			midifile.read(options.getArg(i+1));
+			midiroll.read(options.getArg(i+1));
 			if (options.getArgCount() > 1) {
 				cout << options.getArg(i+1) << '\t';
 			}
-			cout << midifile.getTicksPerQuarterNote() / factor << endl;
+			cout << midiroll.getRollTempo() << endl;
 		}
 	}
 }
