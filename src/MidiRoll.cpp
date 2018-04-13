@@ -109,3 +109,28 @@ double MidiRoll::getRollTempo(double dpi) {
 
 
 
+//////////////////////////////
+//
+// MidiRoll::getTextMetaMessages --
+//
+
+vector<MidiEvent*> MidiRoll::getTextMetaMessages(void) {
+   vector<MidiEvent*> mes;
+   for (int i=0; i<getTrackCount(); i++) {
+      for (int j=0; j<operator[](i).getSize(); j++) {
+         MidiEvent* mm = &operator[](i)[j];
+         if (!mm->isMetaMessage()) {
+            continue;
+         }
+         int mtype = mm->getMetaType();
+         if (mtype != 0x01) {
+            continue;
+         }
+         mes.push_back(mm);
+      }
+   }
+   return mes;
+}
+
+
+

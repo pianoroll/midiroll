@@ -31,6 +31,7 @@ class MidiRoll : public MidiFile {
 
 		void   setRollTempo     (double tempo, double dpi = 300.0);
 		double getRollTempo     (double dpi = 300.0);
+      vector<MidiEvent*> getTextMetaMessages(void);
 };
 
 
