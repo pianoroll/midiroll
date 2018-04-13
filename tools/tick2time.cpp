@@ -10,7 +10,6 @@
 //                Tempo changes will be processes when calculating
 //                time.
 //
-//
 
 #include "Options.h"
 #include "MidiFile.h"
