@@ -112,7 +112,8 @@ double MidiRoll::getRollTempo(double dpi) {
 
 //////////////////////////////
 //
-// MidiRoll::getTextEvents --
+// MidiRoll::getTextEvents -- Return a list of all MIDI events which are
+//    meta-message text events.
 //
 
 vector<MidiEvent*> MidiRoll::getTextEvents(void) {
@@ -125,6 +126,41 @@ vector<MidiEvent*> MidiRoll::getTextEvents(void) {
          }
          int mtype = mm->getMetaType();
          if (mtype != 0x01) {
+            continue;
+         }
+         mes.push_back(mm);
+      }
+   }
+   return mes;
+}
+
+
+
+//////////////////////////////
+//
+// MidiRoll::getMetadataEvents -- Return a list of all MIDI events
+//    that are meta-message text events that have the structure of
+//    a metadata key/value pair.
+//
+
+vector<MidiEvent*> MidiRoll::getMetadataEvents(void) {
+   vector<MidiEvent*> mes;
+   string marker = getMetadataMarker();
+   for (int i=0; i<getTrackCount(); i++) {
+      for (int j=0; j<operator[](i).getSize(); j++) {
+         MidiEvent* mm = &operator[](i)[j];
+         if (!mm->isMetaMessage()) {
+            continue;
+         }
+         int mtype = mm->getMetaType();
+         if (mtype != 0x01) {
+            continue;
+         }
+         string content = mm->getMetaContent();
+         if (content.compare(0, marker.size(), marker) != 0) {
+            continue;
+         }
+         if (content.find(":", marker.size()) == string::npos) {
             continue;
          }
          mes.push_back(mm);

@@ -33,6 +33,7 @@ class MidiRoll : public MidiFile {
                                                double dpi = 300.0);
 		double               getRollTempo       (double dpi = 300.0);
       vector<MidiEvent*>   getTextEvents      (void);
+      vector<MidiEvent*>   getMetadataEvents  (void);
 
       string               getMetadata        (const string& key);
       int                  setMetadata        (const string& key, 
