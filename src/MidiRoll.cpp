@@ -235,9 +235,12 @@ int MidiRoll::setMetadata(const string& key, const string& value) {
       string content = mr[0][i].getMetaContent();
       try {
          if (regex_search(content, match, re) && (match.size() > 1)) {
-            string newvalue = " ";
-            newvalue += value;
-            mr[0][i].setMetaContent(newvalue);
+            string newline;
+            newline += getMetadataMarker();
+            newline += key;
+            newline += ": ";
+            newline += value;
+            mr[0][i].setMetaContent(newline);
             found = true;
             output = mr[0][i].tick;
             break;
@@ -250,12 +253,13 @@ int MidiRoll::setMetadata(const string& key, const string& value) {
       return output;
    }
 
-   string content = getMetadataMarker();
-   content += key;
-   content += ": ";
-   content += value;
+   string newline;
+   newline += getMetadataMarker();
+   newline += key;
+   newline += ": ";
+   newline += value;
 
-   mr.addText(0, 0, content);
+   mr.addText(0, 0, newline);
    mr.sortTrack(0);
 
    return output;
