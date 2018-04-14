@@ -1414,6 +1414,21 @@ int MidiFile::addMetaEvent(int aTrack, int aTick, int aType,
 
 //////////////////////////////
 //
+// MidiFile::addText --  Add a text meta-message (#1).
+//
+
+int MidiFile::addText(int aTrack, int aTick, const string& text) {
+   MidiEvent* me = new MidiEvent;
+   me->makeText(text);
+   me->tick = aTick;
+   events[aTrack]->push_back_no_copy(me);
+   return events[aTrack]->size() - 1;
+}
+
+
+
+//////////////////////////////
+//
 // MidiFile::addCopyright --  Add a copyright notice meta-message (#2).
 //
 
@@ -2009,6 +2024,13 @@ void MidiFile::setMillisecondTicks(void) {
 void MidiFile::sortTrack(MidiEventList& trackData) {
    if (theTimeState == TIME_STATE_ABSOLUTE) {
       qsort(trackData.data(), trackData.size(), sizeof(MidiEvent*), eventcompare);
+   }
+}
+
+
+void MidiFile::sortTrack(int track) {
+   if ((track >= 0) && (track < getTrackCount())) {
+      sortTrack(operator[](track));
    }
 }
 

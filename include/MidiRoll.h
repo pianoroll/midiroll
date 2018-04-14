@@ -18,20 +18,39 @@ using namespace std;
 
 class MidiRoll : public MidiFile {
 	public:
-		          MidiRoll      (void);
-		          MidiRoll      (const char* aFile);
-		          MidiRoll      (const string& aFile);
-		          MidiRoll      (istream& input);
-		          MidiRoll      (const MidiRoll& other);
-		          MidiRoll      (MidiRoll&& other);
-		         ~MidiRoll      ();
+		          MidiRoll   (void);
+		          MidiRoll   (const char* aFile);
+		          MidiRoll   (const string& aFile);
+		          MidiRoll   (istream& input);
+		          MidiRoll   (const MidiRoll& other);
+		          MidiRoll   (MidiRoll&& other);
+		         ~MidiRoll   ();
 
-		MidiRoll& operator=     (const MidiRoll& other);
-		MidiRoll& operator=     (const MidiFile& other);
+		MidiRoll& operator=  (const MidiRoll& other);
+		MidiRoll& operator=  (const MidiFile& other);
 
-		void   setRollTempo     (double tempo, double dpi = 300.0);
-		double getRollTempo     (double dpi = 300.0);
-      vector<MidiEvent*> getTextMetaMessages(void);
+		void                 setRollTempo       (double tempo,
+                                               double dpi = 300.0);
+		double               getRollTempo       (double dpi = 300.0);
+      vector<MidiEvent*>   getTextEvents      (void);
+
+      string               getMetadata        (const string& key);
+      int                  setMetadata        (const string& key, 
+                                               const string& value);
+
+
+      // variable accessor functions:
+      double               getLengthDpi       (void);
+      void                 setLengthDpi       (double value);
+      double               getWidthDpi        (void);
+      void                 setWidthDpi        (double value);
+      string               getMetadataMarker  (void);
+      void                 setMetadataMarker  (const string& value);
+
+   private:
+      double m_lengthdpi      = 300.0;
+      double m_widthdpi       = 300.0;
+      string m_metadatamarker = "@";
 };
 
 

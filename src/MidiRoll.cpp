@@ -13,6 +13,7 @@
 #include "MidiRoll.h"
 
 #include <iostream>
+#include <regex>
 
 using namespace std;
 
@@ -111,10 +112,10 @@ double MidiRoll::getRollTempo(double dpi) {
 
 //////////////////////////////
 //
-// MidiRoll::getTextMetaMessages --
+// MidiRoll::getTextEvents --
 //
 
-vector<MidiEvent*> MidiRoll::getTextMetaMessages(void) {
+vector<MidiEvent*> MidiRoll::getTextEvents(void) {
    vector<MidiEvent*> mes;
    for (int i=0; i<getTrackCount(); i++) {
       for (int j=0; j<operator[](i).getSize(); j++) {
@@ -130,6 +131,172 @@ vector<MidiEvent*> MidiRoll::getTextMetaMessages(void) {
       }
    }
    return mes;
+}
+
+
+
+//////////////////////////////
+//
+// MidiRoll::metadata -- returns the value associated with a metadata key.
+//     returns an empty string if the metadata key is not found.  The returned
+//     value has whitespace trimmed from front and back of value.  Metadata will
+//     only be searched for in the first track of the file.  Only the first
+//     occurrence of the metadata key will be considered.
+//
+
+string MidiRoll::getMetadata(const string& key) {
+   string output;
+   string query;
+   query += getMetadataMarker();
+   query += key;
+   query += ":\\s*(.*)\\s*$";
+   regex re(query);
+   smatch match;
+   MidiRoll& mr = *this;
+   for (int i=0; i<mr[0].size(); i++) {
+      if (!mr[0][i].isText()) {
+         continue;
+      }
+      string content = mr[0][i].getMetaContent();
+      try {
+         if (regex_search(content, match, re) && (match.size() > 1)) {
+            output = match.str(1);
+            break;
+         }
+      } catch (regex_error& e) {
+         cerr << "PROBLEM SEARCHING FOR METADATA" << endl;
+      }
+   }
+   return output;
+}
+
+
+
+//////////////////////////////
+//
+// MidiRoll::setMetadata -- Change the value of a given metadata key.
+//    If there is no key for that metadata value, the add it.
+//
+
+int MidiRoll::setMetadata(const string& key, const string& value) {
+   if (key.empty()) {
+      cerr << "KEY CANNOT BE EMPTY" << endl;
+      return -1;
+   }
+   bool found = false;
+   int output = 0;
+   string query;
+   query += getMetadataMarker();
+   query += key;
+   query += ":\\s*(.*)\\s*$";
+   regex re(query);
+   smatch match;
+   MidiRoll& mr = *this;
+   for (int i=0; i<mr[0].size(); i++) {
+      if (!mr[0][i].isText()) {
+         continue;
+      }
+      string content = mr[0][i].getMetaContent();
+      try {
+         if (regex_search(content, match, re) && (match.size() > 1)) {
+            string newvalue = " ";
+            newvalue += value;
+            mr[0][i].setMetaContent(newvalue);
+            found = true;
+            output = mr[0][i].tick;
+            break;
+         }
+      } catch (regex_error& e) {
+         cerr << "PROBLEM SEARCHING FOR METADATA" << endl;
+      }
+   }
+   if (found) {
+      return output;
+   }
+
+   string content = getMetadataMarker();
+   content += key;
+   content += ": ";
+   content += value;
+
+   mr.addText(0, 0, content);
+   mr.sortTrack(0);
+
+   return output;
+}
+
+
+
+//////////////////////////////
+//
+// MidiRoll::getLengthDpi -- Get the DPI resolution of the original scan
+//    along the length of the piano roll.
+//
+
+double MidiRoll::getLengthDpi(void) {
+   return m_lengthdpi;
+}
+
+
+
+//////////////////////////////
+//
+// MidiRoll::setLengthDpi -- Set the DPI resolution of the original scan
+//     along the length of the piano roll.
+//
+
+void MidiRoll::setLengthDpi(double value) {
+   if (value > 0) {
+      m_lengthdpi = value;
+   }
+}
+
+
+
+//////////////////////////////
+//
+// MidiRoll::getWidthDpi -- Get the DPI resolution of the original
+//    scan across the width of the piano roll.
+//
+
+double MidiRoll::getWidthDpi(void) { 
+   return m_widthdpi;
+}
+
+
+
+//////////////////////////////
+//
+// MidiRoll::setWidthDpi -- Set the DPI resolution of the original scan
+//     across the width of the piano roll.
+//
+
+void MidiRoll::setWidthDpi(double value) {
+   if (value > 0) {
+      m_widthdpi = value;
+   }
+}
+
+
+
+//////////////////////////////
+//
+// MidiRoll::getMetadataMarker --
+//
+
+string MidiRoll::getMetadataMarker(void) {
+   return m_metadatamarker;
+}
+
+
+
+//////////////////////////////
+//
+// MidiRoll::getMetadataMarker --
+//
+
+void MidiRoll::setMetadataMarker(const string& value) {
+   m_metadatamarker = value;
 }
 
 
