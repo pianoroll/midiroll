@@ -61,6 +61,9 @@ clean:
 superclean: clean
 	-rm -rf bin
 
+update:
+	(cd external; ./.download)
+
 bin:      programs
 examples: programs
 programs:
