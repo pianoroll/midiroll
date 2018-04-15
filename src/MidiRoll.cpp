@@ -46,7 +46,7 @@ MidiRoll::~MidiRoll() { }
 // MidiRoll::operator= -- Copy constructor.
 //
 
-MidiRoll& MidiRoll::operator=(const MidiRoll& other) { 
+MidiRoll& MidiRoll::operator=(const MidiRoll& other) {
 	if (this == &other) {
 		return *this;
 	}
@@ -54,7 +54,7 @@ MidiRoll& MidiRoll::operator=(const MidiRoll& other) {
 	return *this;
 }
 
-MidiRoll& MidiRoll::operator=(const MidiFile& other) { 
+MidiRoll& MidiRoll::operator=(const MidiFile& other) {
 	MidiFile::operator=(other);
 	return *this;
 }
@@ -82,12 +82,12 @@ MidiRoll& MidiRoll::operator=(const MidiFile& other) {
 void MidiRoll::setRollTempo(double tempo, double dpi) {
 	int tpq = int(tempo/10.0 * dpi*12.0/60.0 + 0.5);
 	if (tpq < 1) {
-      // SMPTE ticks or error: do not alter
+		// SMPTE ticks or error: do not alter
 		cerr << "Error: tpq is too small: " << tpq << endl;
 		return;
 	}
 	if (tpq > 0x7FFF) {
-      // SMPTE ticks: do not alter
+		// SMPTE ticks: do not alter
 		cerr << "Error: tpq is too large: " << tpq << endl;
 		return;
 	}
@@ -117,21 +117,21 @@ double MidiRoll::getRollTempo(double dpi) {
 //
 
 vector<MidiEvent*> MidiRoll::getTextEvents(void) {
-   vector<MidiEvent*> mes;
-   for (int i=0; i<getTrackCount(); i++) {
-      for (int j=0; j<operator[](i).getSize(); j++) {
-         MidiEvent* mm = &operator[](i)[j];
-         if (!mm->isMetaMessage()) {
-            continue;
-         }
-         int mtype = mm->getMetaType();
-         if (mtype != 0x01) {
-            continue;
-         }
-         mes.push_back(mm);
-      }
-   }
-   return mes;
+	vector<MidiEvent*> mes;
+	for (int i=0; i<getTrackCount(); i++) {
+		for (int j=0; j<operator[](i).getSize(); j++) {
+			MidiEvent* mm = &operator[](i)[j];
+			if (!mm->isMetaMessage()) {
+				continue;
+			}
+			int mtype = mm->getMetaType();
+			if (mtype != 0x01) {
+				continue;
+			}
+			mes.push_back(mm);
+		}
+	}
+	return mes;
 }
 
 
@@ -144,29 +144,29 @@ vector<MidiEvent*> MidiRoll::getTextEvents(void) {
 //
 
 vector<MidiEvent*> MidiRoll::getMetadataEvents(void) {
-   vector<MidiEvent*> mes;
-   string marker = getMetadataMarker();
-   for (int i=0; i<getTrackCount(); i++) {
-      for (int j=0; j<operator[](i).getSize(); j++) {
-         MidiEvent* mm = &operator[](i)[j];
-         if (!mm->isMetaMessage()) {
-            continue;
-         }
-         int mtype = mm->getMetaType();
-         if (mtype != 0x01) {
-            continue;
-         }
-         string content = mm->getMetaContent();
-         if (content.compare(0, marker.size(), marker) != 0) {
-            continue;
-         }
-         if (content.find(":", marker.size()) == string::npos) {
-            continue;
-         }
-         mes.push_back(mm);
-      }
-   }
-   return mes;
+	vector<MidiEvent*> mes;
+	string marker = getMetadataMarker();
+	for (int i=0; i<getTrackCount(); i++) {
+		for (int j=0; j<operator[](i).getSize(); j++) {
+			MidiEvent* mm = &operator[](i)[j];
+			if (!mm->isMetaMessage()) {
+				continue;
+			}
+			int mtype = mm->getMetaType();
+			if (mtype != 0x01) {
+				continue;
+			}
+			string content = mm->getMetaContent();
+			if (content.compare(0, marker.size(), marker) != 0) {
+				continue;
+			}
+			if (content.find(":", marker.size()) == string::npos) {
+				continue;
+			}
+			mes.push_back(mm);
+		}
+	}
+	return mes;
 }
 
 
@@ -181,29 +181,29 @@ vector<MidiEvent*> MidiRoll::getMetadataEvents(void) {
 //
 
 string MidiRoll::getMetadata(const string& key) {
-   string output;
-   string query;
-   query += getMetadataMarker();
-   query += key;
-   query += ":\\s*(.*)\\s*$";
-   regex re(query);
-   smatch match;
-   MidiRoll& mr = *this;
-   for (int i=0; i<mr[0].size(); i++) {
-      if (!mr[0][i].isText()) {
-         continue;
-      }
-      string content = mr[0][i].getMetaContent();
-      try {
-         if (regex_search(content, match, re) && (match.size() > 1)) {
-            output = match.str(1);
-            break;
-         }
-      } catch (regex_error& e) {
-         cerr << "PROBLEM SEARCHING FOR METADATA" << endl;
-      }
-   }
-   return output;
+	string output;
+	string query;
+	query += getMetadataMarker();
+	query += key;
+	query += ":\\s*(.*)\\s*$";
+	regex re(query);
+	smatch match;
+	MidiRoll& mr = *this;
+	for (int i=0; i<mr[0].size(); i++) {
+		if (!mr[0][i].isText()) {
+			continue;
+		}
+		string content = mr[0][i].getMetaContent();
+		try {
+			if (regex_search(content, match, re) && (match.size() > 1)) {
+				output = match.str(1);
+				break;
+			}
+		} catch (regex_error& e) {
+			cerr << "PROBLEM SEARCHING FOR METADATA" << endl;
+		}
+	}
+	return output;
 }
 
 
@@ -215,54 +215,54 @@ string MidiRoll::getMetadata(const string& key) {
 //
 
 int MidiRoll::setMetadata(const string& key, const string& value) {
-   if (key.empty()) {
-      cerr << "KEY CANNOT BE EMPTY" << endl;
-      return -1;
-   }
-   bool found = false;
-   int output = 0;
-   string query;
-   query += getMetadataMarker();
-   query += key;
-   query += ":\\s*(.*)\\s*$";
-   regex re(query);
-   smatch match;
-   MidiRoll& mr = *this;
-   for (int i=0; i<mr[0].size(); i++) {
-      if (!mr[0][i].isText()) {
-         continue;
-      }
-      string content = mr[0][i].getMetaContent();
-      try {
-         if (regex_search(content, match, re) && (match.size() > 1)) {
-            string newline;
-            newline += getMetadataMarker();
-            newline += key;
-            newline += ": ";
-            newline += value;
-            mr[0][i].setMetaContent(newline);
-            found = true;
-            output = mr[0][i].tick;
-            break;
-         }
-      } catch (regex_error& e) {
-         cerr << "PROBLEM SEARCHING FOR METADATA" << endl;
-      }
-   }
-   if (found) {
-      return output;
-   }
+	if (key.empty()) {
+		cerr << "KEY CANNOT BE EMPTY" << endl;
+		return -1;
+	}
+	bool found = false;
+	int output = 0;
+	string query;
+	query += getMetadataMarker();
+	query += key;
+	query += ":\\s*(.*)\\s*$";
+	regex re(query);
+	smatch match;
+	MidiRoll& mr = *this;
+	for (int i=0; i<mr[0].size(); i++) {
+		if (!mr[0][i].isText()) {
+			continue;
+		}
+		string content = mr[0][i].getMetaContent();
+		try {
+			if (regex_search(content, match, re) && (match.size() > 1)) {
+				string newline;
+				newline += getMetadataMarker();
+				newline += key;
+				newline += ": ";
+				newline += value;
+				mr[0][i].setMetaContent(newline);
+				found = true;
+				output = mr[0][i].tick;
+				break;
+			}
+		} catch (regex_error& e) {
+			cerr << "PROBLEM SEARCHING FOR METADATA" << endl;
+		}
+	}
+	if (found) {
+		return output;
+	}
 
-   string newline;
-   newline += getMetadataMarker();
-   newline += key;
-   newline += ": ";
-   newline += value;
+	string newline;
+	newline += getMetadataMarker();
+	newline += key;
+	newline += ": ";
+	newline += value;
 
-   mr.addText(0, 0, newline);
-   mr.sortTrack(0);
+	mr.addText(0, 0, newline);
+	mr.sortTrack(0);
 
-   return output;
+	return output;
 }
 
 
@@ -273,25 +273,25 @@ int MidiRoll::setMetadata(const string& key, const string& value) {
 //
 
 void MidiRoll::trackerize(int trackerheight) {
-   MidiRoll& mr = *this;
-   
+	MidiRoll& mr = *this;
+
 	mr.joinTracks();   // make a single list of events
 	mr.linkNotePairs();
-	
+
 	for (int i=0; i<mr[0].getSize(); i++) {
 		if (!mr[0][i].isNoteOn()) {
 			continue;
 		}
-      MidiEvent* me = mr[0][i].getLinkedEvent();
-      if (!me) {
-         cerr << "MISSING NOTE OFF" << endl;
-         continue;
-      }
-      me->tick += trackerheight;
+		MidiEvent* me = mr[0][i].getLinkedEvent();
+		if (!me) {
+			cerr << "MISSING NOTE OFF" << endl;
+			continue;
+		}
+		me->tick += trackerheight;
 	}
 
 	mr.splitTracks(); // split events into separate tracks again
-   mr.sortTracks();  // necessary since timestamps have been changed
+	mr.sortTracks();  // necessary since timestamps have been changed
 }
 
 
@@ -304,7 +304,7 @@ void MidiRoll::trackerize(int trackerheight) {
 //
 
 double MidiRoll::getLengthDpi(void) {
-   return m_lengthdpi;
+	return m_lengthdpi;
 }
 
 
@@ -316,9 +316,9 @@ double MidiRoll::getLengthDpi(void) {
 //
 
 void MidiRoll::setLengthDpi(double value) {
-   if (value > 0) {
-      m_lengthdpi = value;
-   }
+	if (value > 0) {
+		m_lengthdpi = value;
+	}
 }
 
 
@@ -329,8 +329,8 @@ void MidiRoll::setLengthDpi(double value) {
 //    scan across the width of the piano roll.
 //
 
-double MidiRoll::getWidthDpi(void) { 
-   return m_widthdpi;
+double MidiRoll::getWidthDpi(void) {
+	return m_widthdpi;
 }
 
 
@@ -342,9 +342,9 @@ double MidiRoll::getWidthDpi(void) {
 //
 
 void MidiRoll::setWidthDpi(double value) {
-   if (value > 0) {
-      m_widthdpi = value;
-   }
+	if (value > 0) {
+		m_widthdpi = value;
+	}
 }
 
 
@@ -355,7 +355,7 @@ void MidiRoll::setWidthDpi(double value) {
 //
 
 string MidiRoll::getMetadataMarker(void) {
-   return m_metadatamarker;
+	return m_metadatamarker;
 }
 
 
@@ -366,7 +366,7 @@ string MidiRoll::getMetadataMarker(void) {
 //
 
 void MidiRoll::setMetadataMarker(const string& value) {
-   m_metadatamarker = value;
+	m_metadatamarker = value;
 }
 
 

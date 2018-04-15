@@ -30,29 +30,28 @@ class MidiRoll : public MidiFile {
 		MidiRoll& operator=  (const MidiFile& other);
 
 		void                 setRollTempo       (double tempo,
-                                               double dpi = 300.0);
+		                                         double dpi = 300.0);
 		double               getRollTempo       (double dpi = 300.0);
-      vector<MidiEvent*>   getTextEvents      (void);
-      vector<MidiEvent*>   getMetadataEvents  (void);
+		vector<MidiEvent*>   getTextEvents      (void);
+		vector<MidiEvent*>   getMetadataEvents  (void);
 
-      string               getMetadata        (const string& key);
-      int                  setMetadata        (const string& key, 
-                                               const string& value);
-      void                 trackerize         (int trakerheight);
+		string               getMetadata        (const string& key);
+		int                  setMetadata        (const string& key,
+		                                         const string& value);
+		void                 trackerize         (int trakerheight);
 
+		// variable accessor functions:
+		double               getLengthDpi       (void);
+		void                 setLengthDpi       (double value);
+		double               getWidthDpi        (void);
+		void                 setWidthDpi        (double value);
+		string               getMetadataMarker  (void);
+		void                 setMetadataMarker  (const string& value);
 
-      // variable accessor functions:
-      double               getLengthDpi       (void);
-      void                 setLengthDpi       (double value);
-      double               getWidthDpi        (void);
-      void                 setWidthDpi        (double value);
-      string               getMetadataMarker  (void);
-      void                 setMetadataMarker  (const string& value);
-
-   private:
-      double m_lengthdpi      = 300.0;
-      double m_widthdpi       = 300.0;
-      string m_metadatamarker = "@";
+	private:
+		double m_lengthdpi      = 300.0;
+		double m_widthdpi       = 300.0;
+		string m_metadatamarker = "@";
 };
 
 
