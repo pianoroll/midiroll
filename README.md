@@ -1,5 +1,6 @@
-# Midi Piano Rolls
+# MIDI Piano Rolls
 
+A C++ library to process MIDI files extracted from piano-roll scan images.
 
 ## Downloading
 
