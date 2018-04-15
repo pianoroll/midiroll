@@ -269,7 +269,8 @@ int MidiRoll::setMetadata(const string& key, const string& value) {
 
 //////////////////////////////
 //
-// MidiRoll::trackerize --
+// MidiRoll::trackerize -- Emulate tracker bar extension
+//     of holes on scan.
 //
 
 void MidiRoll::trackerize(int trackerheight) {
@@ -293,7 +294,6 @@ void MidiRoll::trackerize(int trackerheight) {
 	mr.splitTracks(); // split events into separate tracks again
 	mr.sortTracks();  // necessary since timestamps have been changed
 }
-
 
 
 
