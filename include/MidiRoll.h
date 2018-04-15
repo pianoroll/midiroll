@@ -38,6 +38,7 @@ class MidiRoll : public MidiFile {
       string               getMetadata        (const string& key);
       int                  setMetadata        (const string& key, 
                                                const string& value);
+      void                 trackerize         (int trakerheight);
 
 
       // variable accessor functions:

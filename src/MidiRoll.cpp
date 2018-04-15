@@ -269,6 +269,36 @@ int MidiRoll::setMetadata(const string& key, const string& value) {
 
 //////////////////////////////
 //
+// MidiRoll::trackerize --
+//
+
+void MidiRoll::trackerize(int trackerheight) {
+   MidiRoll& mr = *this;
+   
+	mr.joinTracks();   // make a single list of events
+	mr.linkNotePairs();
+	
+	for (int i=0; i<mr[0].getSize(); i++) {
+		if (!mr[0][i].isNoteOn()) {
+			continue;
+		}
+      MidiEvent* me = mr[0][i].getLinkedEvent();
+      if (!me) {
+         cerr << "MISSING NOTE OFF" << endl;
+         continue;
+      }
+      me->tick += trackerheight;
+	}
+
+	mr.splitTracks(); // split events into separate tracks again
+   mr.sortTracks();  // necessary since timestamps have been changed
+}
+
+
+
+
+//////////////////////////////
+//
 // MidiRoll::getLengthDpi -- Get the DPI resolution of the original scan
 //    along the length of the piano roll.
 //

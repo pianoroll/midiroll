@@ -111,6 +111,7 @@ void queryParameter(MidiRoll& rollfile, const string& key) {
 }
 
 
+
 //////////////////////////////
 //
 // setMetadata -- Add or change a metadata key/value pair.
@@ -125,6 +126,7 @@ void setMetadata(MidiRoll& rollfile, const string& key, const string& value,
 		rollfile.write(outputfile);
 	}
 }
+
 
 
 //////////////////////////////
@@ -158,8 +160,6 @@ void listAllMetadata(MidiRoll& rollfile, bool showTicks) {
 		cout << mes[i]->getMetaContent() << endl;
 	}
 }
-
-
 
 
 
