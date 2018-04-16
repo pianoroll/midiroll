@@ -299,6 +299,53 @@ void MidiRoll::trackerize(int trackerheight) {
 
 //////////////////////////////
 //
+// MidiRoll::removeAcceleration -- Remove any tempo meta messages
+//    which are intended to emulate roll acceleration on the pickup
+//    spool of a player piano.
+//
+
+void MidiRoll::removeAcceleration (void) {
+	MidiRoll& mr = *this;
+	for (int i=0; i<mr[0].size(); i++) {
+		if (!mr[0][i].isTempo()) {
+			continue;
+		}
+		mr[0][i].clear();
+	}
+	// Need to add tempo = 60 at tick 0
+	MidiFile::addTempo(0, 0, 60.0);
+	MidiFile::sortTrack(0);
+}
+
+
+
+//////////////////////////////
+//
+// MidiRoll::applyAcceleration -- Emulate roll acceleration according
+//    to the input paramters.
+// default values:
+//      inches  = 12.0;
+//      percent = 0.04;
+//
+
+void MidiRoll::applyAcceleration(double inches, double percent) {
+	removeAcceleration();  // adds first tempo at 60.0
+	double factor  = 1.0 + percent / 100.0;
+	int    maxtick = getMaxTick();
+	double step    = getLengthDpi() * inches;
+	int    count   = int(maxtick / step);
+	double tempo   = 60.0 * factor;
+	for (int i=1; i<count; i++) {
+		addTempo(0, (int)(i*step+0.5), tempo);
+		tempo *= factor;
+	}
+	sortTrack(0);
+}
+
+
+
+//////////////////////////////
+//
 // MidiRoll::getLengthDpi -- Get the DPI resolution of the original scan
 //    along the length of the piano roll.
 //

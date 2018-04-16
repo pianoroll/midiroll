@@ -38,7 +38,14 @@ class MidiRoll : public MidiFile {
 		string               getMetadata        (const string& key);
 		int                  setMetadata        (const string& key,
 		                                         const string& value);
+
+		// tracker bar emulation:
 		void                 trackerize         (int trakerheight);
+
+		// acceleration emulation:
+		void                 removeAcceleration (void);
+		void                 applyAcceleration  (double inches,
+		                                         double percent);
 
 		// variable accessor functions:
 		double               getLengthDpi       (void);
