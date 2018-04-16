@@ -82,6 +82,7 @@ class MidiFile {
       int       getTrackCount             (void) const;
       int       getNumTracks              (void) const;
       int       size                      (void) const;
+      void      removeEmpties             (void);
 
       // join/split track functionality:
       void      markSequence              (void);
@@ -201,8 +202,9 @@ class MidiFile {
 
       MidiFile& operator=(MidiFile other);
 
+      uchar    readByte                (istream& input);
+
       // static functions:
-      static uchar    readByte                (istream& input);
       static ushort   readLittleEndian2Bytes  (istream& input);
       static ulong    readLittleEndian4Bytes  (istream& input);
       static ostream& writeLittleEndianUShort (ostream& out, ushort value);
@@ -224,7 +226,7 @@ class MidiFile {
       int              trackCount;               // # of tracks in file
       int              theTrackState;            // joined or split
       int              theTimeState;             // absolute or delta
-      vector<char>     readFileName;             // read file name
+      string           readFileName;             // read file name
 
       int               timemapvalid;
       vector<_TickTime> timemap;
@@ -235,7 +237,7 @@ class MidiFile {
                                        uchar& runningCommand);
       ulong      readVLValue      (istream& inputfile);
       ulong      unpackVLV        (uchar a = 0, uchar b = 0, uchar c = 0,
-                                   uchar d = 0);
+                                   uchar d = 0, uchar e = 0);
       void       writeVLValue     (long aValue, vector<uchar>& data);
       int        makeVLV          (uchar *buffer, int number);
       static int ticksearch       (const void* A, const void* B);
