@@ -346,6 +346,27 @@ void MidiRoll::applyAcceleration(double inches, double percent) {
 
 //////////////////////////////
 //
+// MidiRoll::convertToMillisecondTicks -- Convert from ticks representing
+//     image pixel rows into ticks representing milliseconds.  MIDI file
+//     is assumed to be in absolute tick mode before calling this function.
+//
+
+void MidiRoll::convertToMillisecondTicks(void) {
+   doTimeAnalysis();
+   setMillisecondTicks();
+   MidiRoll& mr = *this;
+   for (int i=0; i<mr.getTrackCount(); i++) {
+      for (int j=0; j<mr[i].getEventCount(); j++) {
+         mr[i][j].tick = int(mr[i][j].seconds * 1000.0 + 0.5);
+      }
+   }
+	removeAcceleration();
+}
+
+
+
+//////////////////////////////
+//
 // MidiRoll::getLengthDpi -- Get the DPI resolution of the original scan
 //    along the length of the piano roll.
 //
