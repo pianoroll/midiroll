@@ -16,6 +16,7 @@
 #include <iostream>
 
 using namespace std;
+using namespace smf;
 
 // function declarations:
 void printTickToTempoMap(MidiFile& midifile);

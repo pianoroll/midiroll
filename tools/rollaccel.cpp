@@ -15,6 +15,7 @@
 #include <string>
 
 using namespace std;
+using namespace smf;
 
 // function declarations:
 void    processMidiFile    (MidiRoll& rollfile, Options& options);

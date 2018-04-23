@@ -13,10 +13,12 @@
 #include "MidiRoll.h"
 
 #include <iostream>
+#include <vector>
 #include <regex>
+#include <string>
 
-using namespace std;
 
+namespace smf {
 
 //////////////////////////////
 //
@@ -25,8 +27,8 @@ using namespace std;
 
 MidiRoll::MidiRoll(void) : MidiFile() { }
 MidiRoll::MidiRoll(const char* aFile) : MidiFile(aFile) { }
-MidiRoll::MidiRoll(const string& aFile) : MidiFile(aFile) { }
-MidiRoll::MidiRoll(istream& input) : MidiFile(input) { }
+MidiRoll::MidiRoll(const std::string& aFile) : MidiFile(aFile) { }
+MidiRoll::MidiRoll(std::istream& input) : MidiFile(input) { }
 MidiRoll::MidiRoll(const MidiRoll& other) : MidiFile(other) { }
 MidiRoll::MidiRoll(MidiRoll&& other) : MidiFile(other) { }
 
@@ -83,12 +85,12 @@ void MidiRoll::setRollTempo(double tempo, double dpi) {
 	int tpq = int(tempo/10.0 * dpi*12.0/60.0 + 0.5);
 	if (tpq < 1) {
 		// SMPTE ticks or error: do not alter
-		cerr << "Error: tpq is too small: " << tpq << endl;
+		std::cerr << "Error: tpq is too small: " << tpq << std::endl;
 		return;
 	}
 	if (tpq > 0x7FFF) {
 		// SMPTE ticks: do not alter
-		cerr << "Error: tpq is too large: " << tpq << endl;
+		std::cerr << "Error: tpq is too large: " << tpq << std::endl;
 		return;
 	}
 	MidiFile::setTicksPerQuarterNote(tpq);
@@ -116,8 +118,8 @@ double MidiRoll::getRollTempo(double dpi) {
 //    meta-message text events.
 //
 
-vector<MidiEvent*> MidiRoll::getTextEvents(void) {
-	vector<MidiEvent*> mes;
+std::vector<MidiEvent*> MidiRoll::getTextEvents(void) {
+	std::vector<MidiEvent*> mes;
 	for (int i=0; i<getTrackCount(); i++) {
 		for (int j=0; j<operator[](i).getSize(); j++) {
 			MidiEvent* mm = &operator[](i)[j];
@@ -143,9 +145,9 @@ vector<MidiEvent*> MidiRoll::getTextEvents(void) {
 //    a metadata key/value pair.
 //
 
-vector<MidiEvent*> MidiRoll::getMetadataEvents(void) {
-	vector<MidiEvent*> mes;
-	string marker = getMetadataMarker();
+std::vector<MidiEvent*> MidiRoll::getMetadataEvents(void) {
+	std::vector<MidiEvent*> mes;
+	std::string marker = getMetadataMarker();
 	for (int i=0; i<getTrackCount(); i++) {
 		for (int j=0; j<operator[](i).getSize(); j++) {
 			MidiEvent* mm = &operator[](i)[j];
@@ -156,11 +158,11 @@ vector<MidiEvent*> MidiRoll::getMetadataEvents(void) {
 			if (mtype != 0x01) {
 				continue;
 			}
-			string content = mm->getMetaContent();
+			std::string content = mm->getMetaContent();
 			if (content.compare(0, marker.size(), marker) != 0) {
 				continue;
 			}
-			if (content.find(":", marker.size()) == string::npos) {
+			if (content.find(":", marker.size()) == std::string::npos) {
 				continue;
 			}
 			mes.push_back(mm);
@@ -180,27 +182,27 @@ vector<MidiEvent*> MidiRoll::getMetadataEvents(void) {
 //     occurrence of the metadata key will be considered.
 //
 
-string MidiRoll::getMetadata(const string& key) {
-	string output;
-	string query;
+std::string MidiRoll::getMetadata(const std::string& key) {
+	std::string output;
+	std::string query;
 	query += getMetadataMarker();
 	query += key;
 	query += ":\\s*(.*)\\s*$";
-	regex re(query);
-	smatch match;
+	std::regex re(query);
+	std::smatch match;
 	MidiRoll& mr = *this;
 	for (int i=0; i<mr[0].size(); i++) {
 		if (!mr[0][i].isText()) {
 			continue;
 		}
-		string content = mr[0][i].getMetaContent();
+		std::string content = mr[0][i].getMetaContent();
 		try {
-			if (regex_search(content, match, re) && (match.size() > 1)) {
+			if (std::regex_search(content, match, re) && (match.size() > 1)) {
 				output = match.str(1);
 				break;
 			}
-		} catch (regex_error& e) {
-			cerr << "PROBLEM SEARCHING FOR METADATA" << endl;
+		} catch (std::regex_error& e) {
+			std::cerr << "PROBLEM SEARCHING FOR METADATA" << std::endl;
 		}
 	}
 	return output;
@@ -214,28 +216,28 @@ string MidiRoll::getMetadata(const string& key) {
 //    If there is no key for that metadata value, the add it.
 //
 
-int MidiRoll::setMetadata(const string& key, const string& value) {
+int MidiRoll::setMetadata(const std::string& key, const std::string& value) {
 	if (key.empty()) {
-		cerr << "KEY CANNOT BE EMPTY" << endl;
+		std::cerr << "KEY CANNOT BE EMPTY" << std::endl;
 		return -1;
 	}
 	bool found = false;
 	int output = 0;
-	string query;
+	std::string query;
 	query += getMetadataMarker();
 	query += key;
 	query += ":\\s*(.*)\\s*$";
-	regex re(query);
-	smatch match;
+	std::regex re(query);
+	std::smatch match;
 	MidiRoll& mr = *this;
 	for (int i=0; i<mr[0].size(); i++) {
 		if (!mr[0][i].isText()) {
 			continue;
 		}
-		string content = mr[0][i].getMetaContent();
+		std::string content = mr[0][i].getMetaContent();
 		try {
-			if (regex_search(content, match, re) && (match.size() > 1)) {
-				string newline;
+			if (std::regex_search(content, match, re) && (match.size() > 1)) {
+				std::string newline;
 				newline += getMetadataMarker();
 				newline += key;
 				newline += ": ";
@@ -245,15 +247,15 @@ int MidiRoll::setMetadata(const string& key, const string& value) {
 				output = mr[0][i].tick;
 				break;
 			}
-		} catch (regex_error& e) {
-			cerr << "PROBLEM SEARCHING FOR METADATA" << endl;
+		} catch (std::regex_error& e) {
+			std::cerr << "PROBLEM SEARCHING FOR METADATA" << std::endl;
 		}
 	}
 	if (found) {
 		return output;
 	}
 
-	string newline;
+	std::string newline;
 	newline += getMetadataMarker();
 	newline += key;
 	newline += ": ";
@@ -285,7 +287,7 @@ void MidiRoll::trackerize(int trackerheight) {
 		}
 		MidiEvent* me = mr[0][i].getLinkedEvent();
 		if (!me) {
-			cerr << "MISSING NOTE OFF" << endl;
+			std::cerr << "MISSING NOTE OFF" << std::endl;
 			continue;
 		}
 		me->tick += trackerheight;
@@ -422,7 +424,7 @@ void MidiRoll::setWidthDpi(double value) {
 // MidiRoll::getMetadataMarker --
 //
 
-string MidiRoll::getMetadataMarker(void) {
+std::string MidiRoll::getMetadataMarker(void) {
 	return m_metadatamarker;
 }
 
@@ -433,9 +435,12 @@ string MidiRoll::getMetadataMarker(void) {
 // MidiRoll::getMetadataMarker --
 //
 
-void MidiRoll::setMetadataMarker(const string& value) {
+void MidiRoll::setMetadataMarker(const std::string& value) {
 	m_metadatamarker = value;
 }
+
+
+} // end smf namespace
 
 
 
