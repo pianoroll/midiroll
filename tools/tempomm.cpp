@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 
 	if (options.getBoolean("list")) {
 		displayTempo(options);
-	} else if (options.getBoolean("tempo")) {
+	} else if (options.getBoolean("factor")) {
 		setTempo(options);
 	} else {
 		cerr << "Usage: " << options.getCommand()
@@ -74,15 +74,18 @@ void setTempo(Options& options) {
 		midiroll.read(cin);
 		applyTempoFactor(midiroll, factor);
 		cout << midiroll;
+	} if (options.getArgCount() == 1) {
+		// Read from a file input and write to a standard output
+		midiroll.read(options.getArg(1));
+		applyTempoFactor(midiroll, factor);
+		cout << midiroll;
+	} if (options.getArgCount() == 2) {
+		midiroll.read(options.getArg(1));
+		applyTempoFactor(midiroll, factor);
+		midiroll.write(options.getArg(2));
 	} else {
-		for (int i=0; i < options.getArgCount(); i++) {
-			if (i > 1) {
-				cerr << "Processing file " << options.getArgCount() << endl;
-			}
-			midiroll.read(options.getArg(i+1));
-			applyTempoFactor(midiroll, factor);
-			midiroll.write(options.getArg(i+1));
-		}
+		cerr << "Usage: " << options.getCommand() 
+		     << " [-l|-f #] input.mid [output.mid]" << endl;
 	}
 }
 
