@@ -29,9 +29,10 @@ using namespace smf;
 // function declarations:
 void  displayTempo          (Options& options);
 void  setBreak              (Options& options);
+void  setBreakOverwrite     (Options& options);
 void  applyBreakpoint       (MidiRoll& midiroll, Options& options);
 void  displayRegisterBreak  (Options& options);
-void  displayRegisterBreak  (MidiRoll& midiroll, int count);
+void  displayRegisterBreak  (MidiRoll& midiroll, Options& options, int count);
 void  errorMessage          (Options& options, const string& message = "");
 
 
@@ -49,10 +50,16 @@ int main(int argc, char** argv) {
 	options.define("d|duo-art=b", "boundary between treble and bass notes is 63.5");
 	options.define("treble-track=i:2", "track containing treble notes");
 	options.define("bass-track=i:1", "track containing bass notes");
+	options.define("replace=b", "replace contents of input files");
+	options.define("r|range=b", "show total ranges");
 	options.process(argc, argv);
 
 	if (options.getBoolean("list")) {
 		displayRegisterBreak(options);
+	 } if (options.getBoolean("range")) {
+		displayRegisterBreak(options);
+	} else if (options.getBoolean("replace")) {
+		setBreakOverwrite(options);
 	} else {
 		setBreak(options);
 	}
@@ -97,6 +104,27 @@ void setBreak(Options& options) {
 
 //////////////////////////////
 //
+// setBreakOverwrite -- Same as setBreakOverwrite, but will replace
+//    input MIDI file.
+//
+
+void setBreakOverwrite(Options& options) {
+	MidiRoll midiroll;
+	if (options.getArgCount() == 0) {
+		errorMessage(options);
+	} else {
+		for (int i=0; i<options.getArgCount(); i++) {
+			midiroll.read(options.getArg(i+1));
+			applyBreakpoint(midiroll, options);
+			midiroll.write(options.getArg(i+1));
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
 // applyBreakpoint --
 //
 
@@ -128,6 +156,8 @@ void applyBreakpoint(MidiRoll& midiroll, Options& options) {
 
 	int trebletrack = options.getInteger("treble-track");
 	int basstrack = options.getInteger("bass-track");
+	int basschannel   = 1;
+	int treblechannel = 2;
 
 	midiroll.joinTracks();
 	for (int i=0; i<midiroll[0].getEventCount(); i++) {
@@ -139,11 +169,13 @@ void applyBreakpoint(MidiRoll& midiroll, Options& options) {
 		if (track == trebletrack) {
 			if (key < breakpoint) {
 				midiroll[0][i].track = basstrack;
+				midiroll[0][i].setChannel(basschannel);
 			}
 		}
 		if (track == basstrack) {
 			if (key > breakpoint) {
 				midiroll[0][i].track = trebletrack;
+				midiroll[0][i].setChannel(treblechannel);
 			}
 		}
 	}
@@ -164,14 +196,22 @@ void displayRegisterBreak(Options& options) {
 	// display the register breaks of each MIDI file
 	if (options.getArgCount() == 0) {
 		midiroll.read(cin);
-		displayRegisterBreak(midiroll, 1);
+		displayRegisterBreak(midiroll, options, 1);
 	} else {
 		for (int i=0; i<options.getArgCount(); i++) {
 			midiroll.read(options.getArg(i+1));
 			if (options.getArgCount() > 1) {
-				cout << options.getArg(i+1) << endl;
+				cout << options.getArg(i+1);
+				if (!options.getBoolean("range")) {
+					cout  << endl;
+				} else {
+					cout << "\t";
+				}
 			}
-			displayRegisterBreak(midiroll, options.getArgCount());
+			displayRegisterBreak(midiroll, options, options.getArgCount());
+			if (options.getBoolean("range")) {
+				cout << "\n";
+			}
 		}
 	}
 }
@@ -183,7 +223,7 @@ void displayRegisterBreak(Options& options) {
 // displayRegisterBreak --
 //
 
-void displayRegisterBreak(MidiRoll& midiroll, int count) {
+void displayRegisterBreak(MidiRoll& midiroll, Options& options, int count) {
 	vector<pair<int, int>> trackrange;
 	string prefix;
 	if (count > 1) {
@@ -222,22 +262,27 @@ void displayRegisterBreak(MidiRoll& midiroll, int count) {
 		}
 	}
 
-	cout << prefix << "TRK\tMIN\tMAX\tNOTE\n";
-	for (int i=0; i<(int)trackrange.size(); i++) {
-		cout << prefix << i << "\t";
-		cout << trackrange[i].first << "\t";
-		cout << trackrange[i].second << "\t";
-		switch (i) {
-			case 0: cout << "acceleration emulation"; break;
-			case 1: cout << "bass notes"; break;
-			case 2: cout << "treble notes"; break;
-			case 3: cout << "bass expression"; break;
-			case 4: cout << "treble expression"; break;
+	if (options.getBoolean("range")) {
+		cout << "\tmin:" << minn << "\tmax:" << maxx << "\t";
+		cout << "range: " << (maxx - minn) + 1;
+	} else {
+		cout << prefix << "TRK\tMIN\tMAX\tNOTE\n";
+		for (int i=0; i<(int)trackrange.size(); i++) {
+			cout << prefix << i << "\t";
+			cout << trackrange[i].first << "\t";
+			cout << trackrange[i].second << "\t";
+			switch (i) {
+				case 0: cout << "acceleration emulation"; break;
+				case 1: cout << "bass notes"; break;
+				case 2: cout << "treble notes"; break;
+				case 3: cout << "bass expression"; break;
+				case 4: cout << "treble expression"; break;
+			}
+			cout << endl;
 		}
-		cout << endl;
+		cout << prefix << "all" << "\t" << minn << "\t" << maxx << "\t";
+		cout << "range: " << (maxx - minn) + 1 << " notes" << endl;
 	}
-	cout << prefix << "all" << "\t" << minn << "\t" << maxx << "\t";
-	cout << "range: " << (maxx - minn) + 1 << " notes" << endl;
 
 }
 
