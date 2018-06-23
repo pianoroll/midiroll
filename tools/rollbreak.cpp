@@ -16,7 +16,7 @@
 //           Set the break between 65 (bass register) and 66 (treble register)
 //           (-g means "green roll")
 //      rollbreak -l file.mid [file2.mid ...]
-//           List the the break point of the midifile.
+//           List the break point of the midifile.
 //
 
 #include "Options.h"
@@ -40,18 +40,18 @@ void  errorMessage          (Options& options, const string& message = "");
 
 int main(int argc, char** argv) {
 	Options options;
-	options.define("l|list=b", "list roll tempo(s)");
-	options.define("b|break=d:66.5", "boundary between treble and bass notes");
+	options.define("l|list=b",         "list roll tempo(s)");
+	options.define("b|break=d:66.5",   "boundary between treble and bass notes");
 	options.define("w|welte-mignon=b", "boundary between treble and bass notes is 66.5");
-	options.define("green-welte=b", "boundary between treble and bass notes is 66.5");
-	options.define("red-welte=b", "boundary between treble and bass notes is 66.5");
+	options.define("green-welte=b",    "boundary between treble and bass notes is 66.5");
+	options.define("red-welte=b",      "boundary between treble and bass notes is 66.5");
 	options.define("licensee-welte=b", "boundary between treble and bass notes is 66.5");
-	options.define("a|ampico=b", "boundary between treble and bass notes is 64.5");
-	options.define("d|duo-art=b", "boundary between treble and bass notes is 63.5");
+	options.define("a|ampico=b",       "boundary between treble and bass notes is 64.5");
+	options.define("d|duo-art=b",      "boundary between treble and bass notes is 63.5");
 	options.define("treble-track=i:2", "track containing treble notes");
-	options.define("bass-track=i:1", "track containing bass notes");
-	options.define("replace=b", "replace contents of input files");
-	options.define("r|range=b", "show total ranges");
+	options.define("bass-track=i:1",   "track containing bass notes");
+	options.define("replace=b",        "replace contents of input files");
+	options.define("r|range=b",        "show total ranges");
 	options.process(argc, argv);
 
 	if (options.getBoolean("list")) {
@@ -104,7 +104,7 @@ void setBreak(Options& options) {
 
 //////////////////////////////
 //
-// setBreakOverwrite -- Same as setBreakOverwrite, but will replace
+// setBreakOverwrite -- Same as setBreak, but will replace
 //    input MIDI file.
 //
 
