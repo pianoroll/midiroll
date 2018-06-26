@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 	if ((!filename.empty()) && (options.getBoolean("output-file"))) {
 		rollfile.write(filename);
 	} else if ((options.getArgCount() > 0) && options.getBoolean("replace")) {
-		rollfile.write(filename);
+		rollfile.write(options.getArg(1));
 	} else {
 		cout << rollfile;
 	}
