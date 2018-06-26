@@ -13,17 +13,19 @@
 #include "MidiRoll.h"
 #include <iostream>
 #include <string>
+#include <stdlib.h>
 
 using namespace std;
 using namespace smf;
 
 // function declarations:
-void    processMidiFile    (MidiRoll& rollfile, Options& options);
+void    processMidiFile    (MidiRoll& rollfile, Options& options, int index = -1);
 void    queryParameter     (MidiRoll& rollfile, const string& query);
 void    setMetadata        (MidiRoll& rollfile, const string& key,
                             const string& value, const string& outputfile);
 void    listAllText        (MidiRoll& rollfile, bool showTicks);
 void    listAllMetadata    (MidiRoll& rollfile, bool showTicks);
+void    errorMessage       (const string& message);
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -36,15 +38,19 @@ int main(int argc, char** argv) {
 	options.define("m|metadata=b", "list all metadata events in file");
 	options.define("t|tick|ticks=b", "display tick");
 	options.define("p|prefix=s", "metadata prefix charcter(s)");
+	options.define("replace=b", "overwrite the input data with the output data");
 	options.process(argc, argv);
 	MidiRoll midiroll;
 	if (options.getArgCount() == 0) {
 		midiroll.read(cin);
 		processMidiFile(midiroll, options);
 	} else {
+		if ((options.getArgCount() > 1) && options.getBoolean("output")) {
+			errorMessage("Cannot write multiple input files to a single output file");
+		}
 		for (int i=0; i<options.getArgCount(); i++) {
 			midiroll.read(options.getArg(i+1));
-			processMidiFile(midiroll, options);
+			processMidiFile(midiroll, options, i);
 		}
 	}
 	return 0;
@@ -58,14 +64,27 @@ int main(int argc, char** argv) {
 // processMidiFile --
 //
 
-void processMidiFile(MidiRoll& rollfile, Options& options) {
+void processMidiFile(MidiRoll& rollfile, Options& options, int index) {
 	if (options.getBoolean("prefix")) {
 		rollfile.setMetadataMarker(options.getString("prefix"));
 	}
 	if (options.getBoolean("key") && options.getBoolean("value")) {
-		setMetadata(rollfile, options.getString("key"), options.getString("value"),
-				options.getString("output"));
+      // Need to set the given key to the value and then write the result to a file
+      // or standard output.
+		rollfile.setMetadata(options.getString("key"), options.getString("value"));
+		if (options.getBoolean("output")) {
+			// write to the given output file (should be guaranteed to be 
+			// a single input by the calling function)
+			rollfile.write(options.getString("output"));
+		} else if ((index >= 0) && options.getBoolean("replace")) {
+			// write to the same file that was read
+			rollfile.write(options.getArg(index+1));
+		} else {
+			// write to standard outupt
+			cout << rollfile;
+		}
 	} else if (options.getBoolean("key")) {
+		// Searching for a given key, so print its value if present in the MIDI file:
 		queryParameter(rollfile, options.getString("key"));
 	} else if (options.getBoolean("metadata")) {
 		listAllMetadata(rollfile, options.getBoolean("ticks"));
@@ -120,7 +139,6 @@ void queryParameter(MidiRoll& rollfile, const string& key) {
 
 void setMetadata(MidiRoll& rollfile, const string& key, const string& value,
 		const string& outputfile) {
-	rollfile.setMetadata(key, value);
 	if (outputfile.empty()) {
 		cout << rollfile;
 	} else {
@@ -160,6 +178,18 @@ void listAllMetadata(MidiRoll& rollfile, bool showTicks) {
 		}
 		cout << mes[i]->getMetaContent() << endl;
 	}
+}
+
+
+
+//////////////////////////////
+//
+// errorMessage --
+//
+
+void errorMessage(const string& message) {
+	cerr << message << endl;
+	exit(1);
 }
 
 
