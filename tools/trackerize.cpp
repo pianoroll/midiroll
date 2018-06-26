@@ -22,7 +22,9 @@ using namespace smf;
 int main(int argc, char** argv) {
 	Options options;
 	options.define("h|tracker-height-in-pixels=i:25", "Height of tracker bar holes in pixels");
+	options.define("s|scale=d:0.9", "Scaling factor to apply");
 	options.define("o|output-file=s", "filename to save output results");
+	options.define("replace=b", "write output to same name as input file");
 	options.process(argc, argv);
 	MidiRoll rollfile;
 	if (options.getArgCount() == 0) {
@@ -33,9 +35,14 @@ int main(int argc, char** argv) {
 		cerr << "Usage: " << options.getCommand() << "  [midifile]" << endl;
 		exit(1);
 	}
-	rollfile.trackerize(options.getDouble("tracker-height-in-pixels"));
+	double value = options.getDouble("tracker-height-in-pixels");
+	value *= options.getDouble("scale");
+	rollfile.trackerize(value);
+	rollfile.setMetadata("HOLE_EXTENSION", to_string(value) + "px");
 	string filename = options.getString("output-file");
 	if ((!filename.empty()) && (options.getBoolean("output-file"))) {
+		rollfile.write(filename);
+	} else if ((options.getArgCount() > 0) && options.getBoolean("replace")) {
 		rollfile.write(filename);
 	} else {
 		cout << rollfile;
