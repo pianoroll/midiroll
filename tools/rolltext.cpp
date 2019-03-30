@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Fri Apr 13 13:30:54 PDT 2018
-// Last Modified: Sat Apr 14 04:27:22 PDT 2018
+// Last Modified: Fri Mar 29 19:40:34 EDT 2019
 // Filename:      midiroll/tools/rolltext.cpp
 // Syntax:        C++11
 // vim:           ts=3
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 	options.define("o|output=s", "output file for writing/changing metadata");
 	options.define("m|metadata=b", "list all metadata events in file");
 	options.define("t|tick|ticks=b", "display tick");
-	options.define("p|prefix=s", "metadata prefix charcter(s)");
+	options.define("p|prefix=s:@", "metadata prefix character(s)");
 	options.define("replace=b", "overwrite the input data with the output data");
 	options.process(argc, argv);
 	MidiRoll midiroll;
