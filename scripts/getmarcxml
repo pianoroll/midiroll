@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+#
+# Programmer:    Craig Stuart Sapp <craig.stanford.edu>
+# Creation Date: Sun Oct 25 00:09:07 PDT 2015
+# Last Modified: Fri Mar 29 19:53:54 EDT 2019
+# Filename:      https://github.com/pianoroll/midiroll/scripts/getmarcxml
+# Syntax:        perl 5
+# vim:           ts=3
+#
+# Description:   Get MARCXML data files for given Searchworks catkey number.
+#                Example:
+#                   getmarcxml 11366492 > catkey-11366492.xml
+#
+
+use strict;
+
+die "Usage: $0 catkey > output.xml" if @ARGV == 0;
+
+my $catkey = $ARGV[0];
+
+my $baseurl = "https://searchworks.stanford.edu/view";
+
+getSearchworksXML($catkey, $baseurl);
+
+exit(0);
+
+
+########################################################################33
+
+
+##############################
+##
+## getSearchworksXML -- Download the searchworks MARC XML file for 
+##    a given CONDON ROLL call number.  Doesn't deal well with > 9999 
+##    catalog entries.
+##
+
+sub getSearchworksXML {
+	my ($catkey, $baseurl) = @_;
+	my $result = `wget $baseurl/$catkey.marcxml -O - | xmllint --format -`;
+	print $result;
+}
+
+
