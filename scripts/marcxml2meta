@@ -65,41 +65,49 @@ print "\n";
 
 if ($cn !~ /^\s*$/) {
 	$cn =~ s/'/\\'/g;
-	print "$command -k CALLNUM -v 'Stanford Libraries $cn' $druid$postfix.mid\n";
+	print "$command -k CALLNUM -v '\t\tStanford Libraries $cn' $druid$postfix.mid\n";
 }
 
 $catkey =~ s/"/\\'/g;
-print "$command -k CATKEY -v '$catkey' $druid$postfix.mid\n";
-print "$command -k SEARCHWORKS -v 'https://searchworks.stanford.edu/view/$catkey' $druid$postfix.mid\n";
+print "$command -k CATKEY -v '\t\t$catkey' $druid$postfix.mid\n";
+print "$command -k SEARCHWORKS -v '\t\thttps://searchworks.stanford.edu/view/$catkey' $druid$postfix.mid\n";
 
 $druid =~ s/"/\\'/g;
-print "$command -k DRUID -v '$druid' $druid$postfix.mid\n";
-print "$command -k PURL -v 'https://purl.stanford.edu/$druid' $druid$postfix.mid\n";
+print "$command -k DRUID -v '\t\t$druid' $druid$postfix.mid\n";
+print "$command -k PURL -v '\t\t\thttps://purl.stanford.edu/$druid' $druid$postfix.mid\n";
 
 $label =~ s/"/\\'/g;
 $catalog =~ s/"/\\'/g;
-print "$command -k LABEL -v '$label $catalog' $druid$postfix.mid\n";
+print "$command -k LABEL -v '\t\t$label $catalog' $druid$postfix.mid\n";
 
 if ($reissue !~ /^\s*$/) {
 	$reissue =~ s/"/\\'/g;
-	print "$command -k REISSUE -v '$reissue' $druid$postfix.mid\n";
+	print "$command -k REISSUE -v '\t\t$reissue' $druid$postfix.mid\n";
 }
 
 if ($title !~ /^\s*$/) {
-	$title =~ s/"/\\'/g;
 	$title =~ s/\s+$//;
-	print "$command -k TITLE -v '$title' $druid$postfix.mid\n";
+	my $titlestring = "";
+	if ($title =~ /'/) {
+		$titlestring = "\"\t\t$title\"";
+		$titlestring =~ s/\\'/'/g;
+	} else {
+		$titlestring = "'\t\t$title'";
+	}
+	print "$command -k TITLE -v $titlestring $druid$postfix.mid\n";
 }
 
 if ($composer !~ /^\s*$/) {
-	$composer =~ s/"/\\'/g;
-	print "$command -k COMPOSER -v '$composer' $druid$postfix.mid\n";
+	$composer = cleanPerson($composer);
+	print "$command -k COMPOSER -v '\t\t$composer' $druid$postfix.mid\n";
 }
 
 if ($performer !~ /^\s*$/) {
-	$performer =~ s/"/\\'/g;
-	print "$command -k PERFORMER -v '$performer' $druid$postfix.mid\n";
+	$performer = cleanPerson($performer);
+	print "$command -k PERFORMER -v '\t\t$performer' $druid$postfix.mid\n";
 }
+
+print "$command -k SOFTWARE_HOLE -v '\thttps://github.com/pianoroll/roll-image-parser' $druid$postfix.mid\n";
 
 print "\n";
 
@@ -135,6 +143,7 @@ sub cleanPerson {
 	$person =~ s/\, piano.*//;
 	$person =~ s/\.$//;
 	$person =~ s/\,\s*$//;
+	$person =~ s/'/\\'/g;
 	return $person;
 }
 
@@ -281,7 +290,6 @@ sub getComposer {
    ##  <subfield code=" ">UNAUTHORIZED</subfield>
    ## </datafield>  
 
-
 	my @performers;
 	my @perfdates;
    my $tperf = "";
@@ -398,7 +406,9 @@ sub getTitle {
 	$title =~ s/\.\s*$//;
 	$title =~ s/\s+$//;
 	$title =~ s/\/\s*$//;
-	$composer =~ s/\.\s*$//;
+	$title =~ s/'/\\'/g;
+
+	# $composer =~ s/\.\s*$//;
 
 	return $title;
 }
