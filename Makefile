@@ -69,6 +69,9 @@ examples: programs
 programs:
 	$(MAKE) -f Makefile.programs
 
+install:
+	sudo cp bin/* /usr/local/bin
+
 
 ##############################
 ##

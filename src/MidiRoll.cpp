@@ -240,7 +240,11 @@ int MidiRoll::setMetadata(const std::string& key, const std::string& value) {
 				std::string newline;
 				newline += getMetadataMarker();
 				newline += key;
-				newline += ": ";
+				newline += ":";
+            if ((!value.empty()) && (!isspace(value[0]))) {
+            } else {
+               newline += " ";
+            }
 				newline += value;
 				mr[0][i].setMetaContent(newline);
 				found = true;
