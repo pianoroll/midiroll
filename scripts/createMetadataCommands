@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+use strict;
+
+my @files = @ARGV;
+
+open (CFILE, "condon.aton") or die "Cannot read condon.aton";
+my @CONDON = <CFILE>;
+close CFILE;
+
+foreach my $file (@files) {
+	processFile($file);
+}
+
+
+sub processFile {
+	my ($filename) = @_;
+	my $base = $filename;
+	$base =~ s/\..*//;
+	my $post = "";
+	if ($base =~ /(-.*)/) {
+		$post = $1;
+	}
+	$base =~ s/-.*//;
+	$base =~ s/_.*//;
+	my $catkey = "";
+	my $druid;
+	for (my $i=0; $i<@CONDON; $i++) {
+		if ($CONDON[$i] =~ /BEGIN/) {
+			$catkey = "";
+			$druid = "";
+		}
+		if ($CONDON[$i] =~ /^\@CATKEY:\s*(\d+)\s*$/) {
+			$catkey = $1;
+		}
+		if ($CONDON[$i] =~ /^\@DRUID:\s*([^\s]+)\s*$/) {
+			$druid = $1;
+			if ($druid eq $base) {
+				if ($post !~ /^\s*$/) {
+					$post = " -p \"$post\" ";
+				} else {
+					$post = "";
+				}
+				print "./marcxml2meta $post -d $druid -c $catkey\n";
+			}
+		}
+	}
+}
+
+
