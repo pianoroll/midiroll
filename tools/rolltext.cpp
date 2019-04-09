@@ -13,6 +13,7 @@
 #include "MidiRoll.h"
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <stdlib.h>
 
 using namespace std;
@@ -125,7 +126,19 @@ v0 FF 2F 00
 
 
 void queryParameter(MidiRoll& rollfile, const string& key, bool fileQ) {
-	string output = rollfile.getMetadata(key);
+	string output;
+	if (key.find(",") != string::npos) {
+		stringstream fields(key);
+		string field;
+		while (getline(fields, field, ',')) {
+			if (!output.empty()) {
+				output += "\t";
+			}
+			output += rollfile.getMetadata(field);
+		}
+	} else {
+		output = rollfile.getMetadata(key);
+	}
 	if (!output.empty()) {
 		if (fileQ) {
 			cout << rollfile.getFilename() << "\t";
