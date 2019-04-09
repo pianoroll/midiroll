@@ -20,7 +20,7 @@ using namespace smf;
 
 // function declarations:
 void    processMidiFile    (MidiRoll& rollfile, Options& options, int index = -1);
-void    queryParameter     (MidiRoll& rollfile, const string& query);
+void    queryParameter     (MidiRoll& rollfile, const string& query, bool fileQ);
 void    setMetadata        (MidiRoll& rollfile, const string& key,
                             const string& value, const string& outputfile);
 void    listAllText        (MidiRoll& rollfile, bool showTicks);
@@ -33,6 +33,7 @@ void    errorMessage       (const string& message);
 int main(int argc, char** argv) {
 	Options options;
 	options.define("k|key=s", "metadata key");
+	options.define("f|filename=b", "display filename");
 	options.define("v|value=s", "metadata value");
 	options.define("o|output=s", "output file for writing/changing metadata");
 	options.define("m|metadata=b", "list all metadata events in file");
@@ -85,7 +86,7 @@ void processMidiFile(MidiRoll& rollfile, Options& options, int index) {
 		}
 	} else if (options.getBoolean("key")) {
 		// Searching for a given key, so print its value if present in the MIDI file:
-		queryParameter(rollfile, options.getString("key"));
+		queryParameter(rollfile, options.getString("key"), options.getBoolean("filename"));
 	} else if (options.getBoolean("metadata")) {
 		listAllMetadata(rollfile, options.getBoolean("ticks"));
 	} else {
@@ -123,9 +124,12 @@ v0 FF 2F 00
 //   value 2
 
 
-void queryParameter(MidiRoll& rollfile, const string& key) {
+void queryParameter(MidiRoll& rollfile, const string& key, bool fileQ) {
 	string output = rollfile.getMetadata(key);
 	if (!output.empty()) {
+		if (fileQ) {
+			cout << rollfile.getFilename() << "\t";
+		}
 		cout << output << endl;
 	}
 }
