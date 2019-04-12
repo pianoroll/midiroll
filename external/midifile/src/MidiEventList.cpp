@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <iterator>
 #include <utility>
+#include <stdlib>
 
 
 namespace smf {
