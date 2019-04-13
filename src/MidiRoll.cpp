@@ -337,7 +337,7 @@ void MidiRoll::removeAcceleration (void) {
 void MidiRoll::applyAcceleration(double inches, double percent) {
 	removeAcceleration();  // adds first tempo at 60.0
 	double factor  = 1.0 + percent / 100.0;
-	int    maxtick = getMaxTick();
+	int    maxtick = getFileDurationInTicks();
 	double step    = getLengthDpi() * inches;
 	int    count   = int(maxtick / step);
 	double tempo   = 60.0 * factor;

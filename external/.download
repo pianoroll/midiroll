@@ -1,9 +1,9 @@
-wget https://raw.githubusercontent.com/craigsapp/midifile/master/src-library/Binasc.cpp -O midifile/src/Binasc.cpp
-wget https://raw.githubusercontent.com/craigsapp/midifile/master/src-library/MidiEvent.cpp -O midifile/src/MidiEvent.cpp
-wget https://raw.githubusercontent.com/craigsapp/midifile/master/src-library/MidiEventList.cpp -O midifile/src/MidiEventList.cpp
-wget https://raw.githubusercontent.com/craigsapp/midifile/master/src-library/MidiFile.cpp -O midifile/src/MidiFile.cpp
-wget https://raw.githubusercontent.com/craigsapp/midifile/master/src-library/MidiMessage.cpp -O midifile/src/MidiMessage.cpp
-wget https://raw.githubusercontent.com/craigsapp/midifile/master/src-library/Options.cpp -O midifile/src/Options.cpp
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/src/Binasc.cpp -O midifile/src/Binasc.cpp
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/src/MidiEvent.cpp -O midifile/src/MidiEvent.cpp
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/src/MidiEventList.cpp -O midifile/src/MidiEventList.cpp
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/src/MidiFile.cpp -O midifile/src/MidiFile.cpp
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/src/MidiMessage.cpp -O midifile/src/MidiMessage.cpp
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/src/Options.cpp -O midifile/src/Options.cpp
 
 wget https://raw.githubusercontent.com/craigsapp/midifile/master/include/Binasc.h -O midifile/include/Binasc.h
 wget https://raw.githubusercontent.com/craigsapp/midifile/master/include/MidiEvent.h -O midifile/include/MidiEvent.h

@@ -19,6 +19,14 @@
 #include <string>
 #include <vector>
 
+#define OPTION_BOOLEAN_TYPE   'b'
+#define OPTION_CHAR_TYPE      'c'
+#define OPTION_DOUBLE_TYPE    'd'
+#define OPTION_FLOAT_TYPE     'f'
+#define OPTION_INT_TYPE       'i'
+#define OPTION_STRING_TYPE    's'
+#define OPTION_UNKNOWN_TYPE   'x'
+
 namespace smf {
 
 class Option_register {
@@ -40,7 +48,7 @@ class Option_register {
 	  const std::string& getOption          (void);
 	  const std::string& getModified        (void);
 	  const std::string& getDescription     (void);
-	  int                isModified         (void);
+	  bool               isModified         (void);
 	  char               getType            (void);
 	  void               reset              (void);
 	  void               setDefault         (const std::string& aString);
@@ -55,7 +63,7 @@ class Option_register {
 		std::string       description;
 		std::string       defaultOption;
 		std::string       modifiedOption;
-		int               modifiedQ;
+		bool              modifiedQ;
 		char              type;
 
 };
@@ -80,7 +88,7 @@ class Options {
 		int                getArgumentCount  (void);
 		const std::vector<std::string>& getArgList      (void);
 		const std::vector<std::string>& getArgumentList (void);
-		int                getBoolean        (const std::string& optionName);
+		bool               getBoolean        (const std::string& optionName);
 		std::string        getCommand        (void);
 		const std::string& getCommandLine    (void);
 		std::string        getDefinition     (const std::string& optionName);
@@ -115,7 +123,7 @@ class Options {
 		void               appendOptions     (const std::string& strang);
 		void               appendOptions     (const std::vector<std::string>& argv);
 		std::ostream&      printRegister     (std::ostream& out);
-		int                isDefined         (const std::string& name);
+		bool               isDefined         (const std::string& name);
 
 	protected:
 		int                           m_options_error_check;  // verify command
@@ -145,14 +153,6 @@ class Options {
 };
 
 } // end of namespace smf
-
-#define OPTION_BOOLEAN_TYPE   'b'
-#define OPTION_CHAR_TYPE      'c'
-#define OPTION_DOUBLE_TYPE    'd'
-#define OPTION_FLOAT_TYPE     'f'
-#define OPTION_INT_TYPE       'i'
-#define OPTION_STRING_TYPE    's'
-#define OPTION_UNKNOWN_TYPE   'x'
 
 
 #endif  /* _OPTIONS_H_INCLUDED */

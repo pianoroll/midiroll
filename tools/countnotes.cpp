@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
 	Options options;
 	options.define("r|welte-red|red-welte=b", "Check if roll is likely red welte");
 	options.define("B|bad|bad-only=b", "Only report if MIDI file is bad");
+	options.define("t|time-of-first=b", "Display time of first note (as percent of total time)");
 	options.process(argc, argv);
 	MidiRoll midiroll;
 	if (options.getArgCount() == 0) {
@@ -53,6 +54,11 @@ int main(int argc, char** argv) {
 
 void processMidiFile(MidiRoll& rollfile, Options& options) {
 	vector<int> keycount(128, 0);
+	vector<int> firsttick(128, -1);
+	int duration = 0;
+	if (options.getBoolean("time-of-first")) {
+		duration = rollfile.getFileDurationInTicks();
+	}
 	for (int i=0; i<rollfile.getTrackCount(); i++) {
 		MidiEventList* mel = &rollfile[i];
 		for (int j=0; j<mel->getEventCount(); j++) {
@@ -60,6 +66,9 @@ void processMidiFile(MidiRoll& rollfile, Options& options) {
 			if (me->isNoteOn()) {
 				int key = me->getKeyNumber();
 				keycount[key]++;
+				if (firsttick[key] == -1) {
+					firsttick[key] = me->tick;
+				}
 			}
 		}
 	}
@@ -88,7 +97,11 @@ void processMidiFile(MidiRoll& rollfile, Options& options) {
 	} else {
 		// List counts of MIDI files by default:
 		for (int i=0; i<(int)keycount.size(); i++) {
-			cout << i << ":\t" << keycount[i] << endl;
+			cout << i << ":\t" << keycount[i];
+			if (duration) {
+				cout << "\t" << (int)(firsttick[i]/(double)duration * 100.0 + 0.5);
+			}
+			cout << endl;
 		}
 	}
 }
