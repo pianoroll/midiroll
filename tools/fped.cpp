@@ -1,12 +1,12 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Apr 20 08:06:49 EDT 2019
-// Last Modified: Sat Apr 20 08:06:52 EDT 2019
+// Last Modified: Sat Apr 20 09:10:12 EDT 2019
 // Filename:      midiroll/tools/fped.cpp
 // Syntax:        C++11
 // vim:           ts=3
 //
-// Description:   Finter pedalling: convert sustain pedal into note extensions.
+// Description:   Finger pedalling: convert sustain pedal into note extensions.
 //
 
 #include "Options.h"
