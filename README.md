@@ -29,6 +29,7 @@ This will compile the utility programs and place them in the `bin` directory.
 |---------------------|--------------------- |
 | asciiroll           | Convert between ASCII and binary MIDI files |
 | countnotes          | Count the number of notes for each pitch.  Useful to verify roll format. |
+| fped                | Convert sustain pedal into note extensions. |
 | mirror              | Mirror pitch to check for images which are scaned in mirrored orientation. |
 | notelist            | |
 | roll2ms             | |
