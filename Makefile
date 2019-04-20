@@ -84,3 +84,13 @@ install:
 	$(MAKE) -f Makefile.programs $@
 
 
+##############################
+##
+## Maintenance functions
+##
+
+update: midifile-update
+midifile-update:
+	(cd external && ./.download)
+
+
