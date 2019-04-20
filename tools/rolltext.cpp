@@ -27,6 +27,7 @@ void    setMetadata        (MidiRoll& rollfile, const string& key,
 void    listAllText        (MidiRoll& rollfile, bool showTicks);
 void    listAllMetadata    (MidiRoll& rollfile, bool showTicks);
 void    errorMessage       (const string& message);
+void    deleteMetadata     (MidiRoll& rollfile, const string& key);
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -40,6 +41,7 @@ int main(int argc, char** argv) {
 	options.define("m|metadata=b", "list all metadata events in file");
 	options.define("t|tick|ticks=b", "display tick");
 	options.define("p|prefix=s:@", "metadata prefix character(s)");
+	options.define("d|delete=b", "delete the specified metadata key and its value");
 	options.define("replace=b", "overwrite the input data with the output data");
 	options.process(argc, argv);
 	MidiRoll midiroll;
@@ -74,6 +76,7 @@ void processMidiFile(MidiRoll& rollfile, Options& options, int index) {
       // Need to set the given key to the value and then write the result to a file
       // or standard output.
 		rollfile.setMetadata(options.getString("key"), options.getString("value"));
+
 		if (options.getBoolean("output")) {
 			// write to the given output file (should be guaranteed to be 
 			// a single input by the calling function)
@@ -85,13 +88,56 @@ void processMidiFile(MidiRoll& rollfile, Options& options, int index) {
 			// write to standard outupt
 			cout << rollfile;
 		}
+
 	} else if (options.getBoolean("key")) {
-		// Searching for a given key, so print its value if present in the MIDI file:
-		queryParameter(rollfile, options.getString("key"), options.getBoolean("filename"));
+		if (options.getBoolean("delete")) {
+			deleteMetadata(rollfile, options.getString("key"));
+
+			if (options.getBoolean("output")) {
+				// write to the given output file (should be guaranteed to be 
+				// a single input by the calling function)
+				rollfile.write(options.getString("output"));
+			} else if ((index >= 0) && options.getBoolean("replace")) {
+				// write to the same file that was read
+				rollfile.write(options.getArg(index+1));
+			} else {
+				// write to standard outupt
+				cout << rollfile;
+			}
+		}
 	} else if (options.getBoolean("metadata")) {
 		listAllMetadata(rollfile, options.getBoolean("ticks"));
 	} else {
 		listAllText(rollfile, options.getBoolean("ticks"));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// deleteMetadata -- Remove a metadata key/value pair.
+//
+
+void deleteMetadata(MidiRoll& rollfile, const string& key) {
+	int eventCount = rollfile[0].getEventCount();
+	string prefix = rollfile.getMetadataMarker();
+	string searcher = prefix + key + ":";
+	int slen = searcher.size();
+	bool empties = false;
+	for (int i=0; i<eventCount; i++) {
+		if (!rollfile[0][i].isText()) {
+			continue;
+		}
+		string data = rollfile[0][i].getMetaContent();
+		if (data.compare(0, slen, searcher) == 0) {
+			rollfile[0][i].clear();
+			empties = true;
+			
+		}
+	}
+	if (empties) {
+		rollfile[0].removeEmpties();
 	}
 }
 
