@@ -62,9 +62,12 @@ void processMidiFile(MidiRoll& rollfile, Options& options) {
 	for (int i=0; i<rollfile[0].getEventCount(); i++) {
 		MidiEvent* me = &rollfile[0][i];
 		me->tick = (int)(me->seconds * 1000.0 + 0.5);
-		if (me->isTempo() && !deletetempo) {
-			me->clear();
-			deletetempo = true;
+		if (me->isTempo()) {
+			if (deletetempo) {
+				me->clear();
+			} else {
+				deletetempo = true;
+			}
 		}
 	}
 
