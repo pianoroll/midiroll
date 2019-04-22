@@ -70,7 +70,7 @@ void processMidiFile(MidiRoll& rollfile, Options& options) {
 
 	rollfile.splitTracks();
 	rollfile.removeEmpties();
-	rollfile.sortTracks();  // maybe not be needed
+	rollfile.sortTracks();  // maybe not needed
 }
 
 
