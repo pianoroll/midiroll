@@ -8,7 +8,7 @@
 //
 // Description:   Convert roll with tempo changes (every foot) into SMPTE timings without
 //                tempo changes, using 25 frames/sec. and 40 subframes/frame.  This makes
-//                each tick 1 millisecond long (Tempo 60 kepts in track 0 to ensure this).
+//                each tick 1 millisecond long (Tempo 60 kept in track 0 to ensure this).
 //
 
 #include "Options.h"
