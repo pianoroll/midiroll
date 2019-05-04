@@ -21,12 +21,15 @@ using namespace smf;
 
 // function declarations:
 void    processMidiFile    (MidiRoll& rollfile, Options& options);
+int     getTotalNotes      (MidiRoll& rollfile);
 
+int Sum = 0;
 
 ///////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char** argv) {
 	Options options;
+	options.define("s|sum=b", "Single count of all notes (not split by pitch-class");
 	options.define("r|welte-red|red-welte=b", "Check if roll is likely red welte");
 	options.define("B|bad|bad-only=b", "Only report if MIDI file is bad");
 	options.define("t|time-of-first=b", "Display time of first note (as percent of total time)");
@@ -43,11 +46,34 @@ int main(int argc, char** argv) {
 			processMidiFile(midiroll, options);
 		}
 	}
+	if (options.getBoolean("sum")) {
+		cout << Sum << endl;
+	}
 	return 0;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////
+
+
+
+//////////////////////////////
+//
+// getTotalNotes -- count all note-ons in the MIDI file.
+//
+
+int getTotalNotes(MidiRoll& rollfile) {
+	int sum = 0;
+	for (int i=0; i<rollfile.getTrackCount(); i++) {
+		for (int j=0; j<rollfile[i].getEventCount(); j++) {
+			if (rollfile[i][j].isNoteOn()) {
+				sum++;
+			}
+		}
+	}
+	return sum;
+}
+
 
 //////////////////////////////
 //
@@ -55,6 +81,10 @@ int main(int argc, char** argv) {
 //
 
 void processMidiFile(MidiRoll& rollfile, Options& options) {
+	if (options.getBoolean("sum")) {
+		Sum += getTotalNotes(rollfile);
+		return;
+	}
 	vector<int> keycount(128, 0);
 	vector<int> firsttick(128, -1);
 	int duration = 0;
