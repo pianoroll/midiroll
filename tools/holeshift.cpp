@@ -33,7 +33,8 @@ int   getRegion           (int key, int bass, int treble, int trebleExp);
 int main(int argc, char** argv) {
 	Options options;
 	options.define("t|transpose=i:0", "Transpose by pitch amount");
-	options.define("r|red-roll=b", "display tick");
+	options.define("r|red|t100|T100|t-100|T-100|red-roll=b", "Split into four registers of red roll");
+	options.define("g|green|t98|T98|t-98|T-98|green-roll=b", "Split into four registers of green roll");
 	options.define("replace=b", "overwrite the input data with the output data");
 	options.process(argc, argv);
 	MidiRoll midiroll;
@@ -104,16 +105,27 @@ void processMidiFile(MidiRoll& rollfile, Options& options) {
 
 	// Now shift the notes to different tracks/channels if they
 	// change registers or move in/out of expression tracks.
-	// Currently only for red Welte rolls.  The numbers are the 
-	// upper boundary note of the notes for a track:
-	// 0 = always lower region of bass expression.
-	// 24 = first note of bass-note region.
-	// 67 = first note of treble-note region.
-	// 104 = first note of treble-expression.
-	applyRegisterSplits(rollfile, 24, 67, 104);
+	// Currently only for red and green Welte rolls.
+	// See RollOptions.cpp source code for where the numbers
+	// came from.
+	if (options.getBoolean("green")) {
+		// 0 = always lower region of bass expression.
+		// 21 = first note of bass-note region.
+		// 67 = first note of treble-note region (G4)
+		// 109 = first note of treble-expression.
+		applyRegisterSplits(rollfile, 21, 67, 109);
+	} else {
+		// red rolls are the default, but maybe make them
+		// not be the default (pianola being the default?).
+
+		// 0 = always lower region of bass expression.
+		// 24 = first note of bass-note region.
+		// 67 = first note of treble-note region (G4)
+		// 104 = first note of treble-expression.
+		applyRegisterSplits(rollfile, 24, 67, 104);
+	}
 
 	rollfile.setMetadata("HOLE_SHIFT", "\t\t" + to_string(transpose));
-
 }
 
 
