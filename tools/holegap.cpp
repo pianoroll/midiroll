@@ -16,6 +16,7 @@
 // Options:       -a # : average +/- pixels on each side of current pixel (3rd column)
 //                -m # : minimum pixel distance to track
 //                -x # : maximum pixel distance to track
+//                -v   : verbose: print name of each file when processing
 //
 
 #include "Options.h"
@@ -30,9 +31,10 @@ using namespace smf;
 void processMidiFile  (vector<int>& histogram, MidiRoll& rollfile);
 void printResults     (vector<int>& histogram, int minlen, int average);
 
-int minlen = 0;	// minimum pixel distance to track
-int maxlen = 99;	// maximum pixel distance to track
-int average = 6;  // number of pixels on each side of target pixel to average
+int  minlen = 0;	     // minimum pixel distance to track
+int  maxlen = 99;	     // maximum pixel distance to track
+int  average = 6;      // number of pixels on each side of target pixel to average
+bool verboseQ = false; // print filename being processed
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -41,10 +43,12 @@ int main(int argc, char** argv) {
 	options.define("a|avg|average=i:6", "Number of pixels to average * 2 + 1");
 	options.define("m|min=i:0", "Minimum pixel size to track");
 	options.define("x|max=i:99", "Maximum pixel size to track");
+	options.define("v|verbose=b", "Display debugging information");
 	options.process(argc, argv);
 
 	minlen = options.getInteger("min");
 	maxlen = options.getInteger("max");
+	verboseQ = options.getBoolean("verbose");
 
 	vector<int> histogram(maxlen - minlen + 1, 0);
 	
@@ -54,6 +58,9 @@ int main(int argc, char** argv) {
 		processMidiFile(histogram, midiroll);
 	} else {
 		for (int i=0; i<options.getArgCount(); i++) {
+			if (verboseQ) {
+				cerr << options.getArg(i+1) << endl;
+			}
 			midiroll.read(options.getArg(i+1));
 			processMidiFile(histogram, midiroll);
 		}
@@ -75,7 +82,7 @@ void processMidiFile(vector<int>& histogram, MidiRoll& rollfile) {
 
 	for (int i=0; i<rollfile.getTrackCount(); i++) {
 		MidiEventList* mel = &rollfile[i];
-		lastOffTime.resize(127);
+		lastOffTime.resize(128);
 		fill(lastOffTime.begin(), lastOffTime.end(), -1);
 		for (int j=0; j<mel->getEventCount(); j++) {
 			MidiEvent* me = &(*mel)[j];
